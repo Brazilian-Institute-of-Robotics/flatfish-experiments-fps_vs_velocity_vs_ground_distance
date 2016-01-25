@@ -1,7 +1,9 @@
 rock_library(fps_per_velocity
-    SOURCES Dummy.cpp
-    HEADERS Dummy.hpp)
+    SOURCES ImageAnalysisTool.cpp
+    HEADERS ImageAnalysisTool.hpp
+    DEPS_PKGCONFIG opencv)
 
-rock_executable(fps_per_velocity_bin Main.cpp
-    DEPS fps_per_velocity)
+#rock_executable(fps_per_velocity_bin
+#    SOURCES Main.cpp
+#    LIBS fps_per_velocity)
 
