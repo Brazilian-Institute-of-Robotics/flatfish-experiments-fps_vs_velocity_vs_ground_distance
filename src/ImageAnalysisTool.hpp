@@ -28,8 +28,8 @@ class ImageAnalysisTool {
   double siftAnalysis(cv::Mat previous_image, cv::Mat current_image);
 
  private:
-  cv::Mat previous_image;
-  cv::Mat current_image;
+  cv::Mat previous_image_;
+  cv::Mat current_image_;
 
 };
 
