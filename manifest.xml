@@ -6,8 +6,7 @@
 	<url>http://</url>
 	<logo>http://</logo>
 	<depend package="base/cmake" />
+	<depend package="tools/pocolog_cpp" />
 	<depend package="opencv" />
 	<depend package="boost" />
-	<depend package="tools/pocolog_cpp" />
-	
 </package>

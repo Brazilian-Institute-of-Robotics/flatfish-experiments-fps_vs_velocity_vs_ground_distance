@@ -9,6 +9,11 @@
 #define DRIVERS_FPS_PER_VELOCITY_TEST_TESTTOOLS_HPP_
 
 #include <pocolog_cpp/InputDataStream.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <frame_helper/FrameHelper.h>
+
 
 #define PATH_LOG_NAV "/home/tiagotrocoli/jarvis/Documents/BIR-dataset/Log/incoming/ff-nav/20151119-0935"
 #define PATH_LOG_PAYLOAD "/home/tiagotrocoli/jarvis/Documents/BIR-dataset/Log/incoming/ff-payload/20151119-0935"
@@ -37,7 +42,13 @@ class TestTools {
       pocolog_cpp::InputDataStream* target_stream, float percente_key_stream =
           0.05);
 
+  template<typename T>
+  static cv::Mat getMatFromStream(pocolog_cpp::InputDataStream* video_stream,
+                                  int index, float percent_image_size);
+
 };
+
+
 
 template<typename T>
 inline T TestTools::getSampleFromDataStream(
@@ -48,6 +59,8 @@ inline T TestTools::getSampleFromDataStream(
   }
   return sample;
 }
+
+
 
 template<typename type_key, typename type_target>
 inline std::map<int, int> TestTools::syncPocologStreamsByTime(
@@ -75,6 +88,25 @@ inline std::map<int, int> TestTools::syncPocologStreamsByTime(
     }
   }
   return sync_map;
+}
+
+
+template<typename T>
+inline cv::Mat TestTools::getMatFromStream(
+    pocolog_cpp::InputDataStream* video_stream, int index,
+    float percent_image_size) {
+
+  base::samples::frame::Frame frame_rock;
+  frame_rock = TestTools::getSampleFromDataStream<T>(video_stream, index);
+
+  cv::Mat image_cv = frame_helper::FrameHelper::convertToCvMat(frame_rock);
+  cv::cvtColor(image_cv, image_cv, CV_BayerGR2RGB);
+  cv::resize(
+      image_cv,
+      image_cv,
+      cv::Size(image_cv.cols * percent_image_size,
+               image_cv.rows * percent_image_size));
+  return image_cv;
 }
 
 #endif /* DRIVERS_FPS_PER_VELOCITY_TEST_TESTTOOLS_HPP_ */
