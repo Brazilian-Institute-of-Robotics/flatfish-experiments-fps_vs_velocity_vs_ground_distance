@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(first_testcase) {
   SingleImageHazeRemoval *hazeRemoval = new CLAHE();
   ImageAnalysisTool image_analysis;
   cv::Mat image_current;
-  for (int i = 1; i < video_stream->getSize() * data_stream_size; i += 1) {
+  for (int i = 1; i < video_stream->getSize() * data_stream_size; i += 15) {
     if (i != 1)
       image_current.copyTo(image_previus);
     else
@@ -55,6 +55,7 @@ BOOST_AUTO_TEST_CASE(first_testcase) {
     image_analysis.siftAnalysis(image_previus, image_current);
   }
 
+  delete (hazeRemoval);
 }
 
 BOOST_AUTO_TEST_CASE(TestHazeRemovalUnderwaterImages_testcase) {
