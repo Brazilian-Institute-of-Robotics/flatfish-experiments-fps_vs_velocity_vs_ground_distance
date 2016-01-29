@@ -13,6 +13,7 @@
 #include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 namespace fps_per_velocity {
 
@@ -120,10 +121,23 @@ double ImageAnalysisTool::siftAnalysis(cv::Mat image_previus,
   perspectiveTransform(obj_corners, scene_corners, H);
 
   cv::Mat image_final = image_current.clone();
+  cv::Mat1b image_final_count = cv::Mat1b::zeros(image_final.size());
+
   for (int i = 0; i < 4; ++i)
     cv::line(image_final, scene_corners[i], scene_corners[(i + 1) % 4],
              cv::Scalar(0, 255, 0), 2);
 
+  for (int i = 0; i < image_final_count.rows; ++i)
+    for (int j = 0; j < image_final_count.cols; ++j) {
+      cv::pointPolygonTest(scene_corners, cv::Point2f(i, j), true) > 0 ?
+          image_final_count[i][j] = 1 : image_final_count[i][j] = 0;
+    }
+
+  cv::Scalar sum = cv::sum(image_final_count);
+  double area = sum[0]
+      / (1.0 * image_final_count.rows * image_final_count.cols);
+
+  std::cout << "AREA OVERLAP = " << area << std::endl;
 // continuar daqui
   //seguir este tutorial
   // http://docs.opencv.org/2.4/doc/tutorials/features2d/feature_homography/feature_homography.html
@@ -133,7 +147,8 @@ double ImageAnalysisTool::siftAnalysis(cv::Mat image_previus,
 //  cv::imshow("CURRENT SIFT", output_current);
 //  cv::imshow("CURRENT", image_current);
   cv::imshow("MATCH", image_matchs);
-  cv::imshow("AREA", image_final);
+  cv::imshow("EDGE GREEN", image_final);
+  cv::imshow("AREA", image_final_count * 255);
   float fps = 5;
   int perid = (1.0 / fps) * 1000;
 //  std::cout << "FPS " << fps << std::endl;

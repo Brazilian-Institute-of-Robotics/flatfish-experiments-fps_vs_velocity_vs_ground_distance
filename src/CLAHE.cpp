@@ -6,7 +6,6 @@
  */
 
 #include "CLAHE.hpp"
-
 #include <vector>
 
 CLAHE::~CLAHE() {

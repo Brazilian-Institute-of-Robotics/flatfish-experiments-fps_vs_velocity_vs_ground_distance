@@ -6,6 +6,7 @@
  */
 
 #include "HistogramEqualization.hpp"
+
 #include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
 
