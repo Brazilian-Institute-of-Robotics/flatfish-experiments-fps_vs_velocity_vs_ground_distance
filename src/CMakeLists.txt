@@ -1,6 +1,6 @@
 rock_library(fps_per_velocity
-    SOURCES ImageAnalysisTool.cpp ImageFeartureDetector.cpp
-    HEADERS ImageAnalysisTool.hpp ImageFeartureDetector.hpp
+    SOURCES ImageAnalysisTool.cpp ImageFeartureDetectorTools.cpp
+    HEADERS ImageAnalysisTool.hpp ImageFeartureDetectorTools.hpp
     DEPS_PKGCONFIG opencv)
     
 rock_library(haze_removal

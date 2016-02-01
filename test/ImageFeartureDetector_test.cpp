@@ -5,7 +5,7 @@
  *      Author: tiagotrocoli
  */
 
-#include "../src/ImageFeartureDetector.hpp"
+#include "../src/ImageFeartureDetectorTools.hpp"
 
 namespace fps_per_velocity {
 
