@@ -19,7 +19,10 @@ class ImageAnalysisTool {
   ImageAnalysisTool();
   // analyse the image overlap based sift
   double siftAnalysis(cv::Mat previous_image, cv::Mat current_image);
+  double calcOverlapPercent(cv::Mat target_image, cv::Mat query_image,
+                            cv::Mat homografy, cv::Mat *overlaped_image = 0);
 
+  void writeMatrixRelation(cv::Mat relation, std::string path_name);
 };
 
 } /* namespace fps_per_velocity */

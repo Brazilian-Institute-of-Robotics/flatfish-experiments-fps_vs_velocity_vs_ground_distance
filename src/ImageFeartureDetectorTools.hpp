@@ -57,7 +57,7 @@ class ImageDetectorDescriptor {
       std::vector<cv::DMatch> matchers,
       std::vector<cv::KeyPoint> previus_keypoints,
       std::vector<cv::KeyPoint> current_keypoints,
-      int ransacReprojThreshold = 3);
+      int ransacReprojThreshold = 3, cv::Mat *homografy = 0);
 
  private:
   cv::Ptr<cv::FeatureDetector> feature_detector_;

@@ -1,24 +1,26 @@
 /*
- * TestTools.cpp
+ * PocologTools.cpp
  *
- *  Created on: Jan 26, 2016
+ *  Created on: Feb 18, 2016
  *      Author: tiagotrocoli
  */
 
-#include "TestTools.hpp"
+#include "PocologTools.hpp"
 
 #include <pocolog_cpp/LogFile.hpp>
 #include <pocolog_cpp/Index.hpp>
 #include <base/Time.hpp>
 
-pocolog_cpp::InputDataStream* TestTools::getDataStreamFromLog(
+namespace fps_per_velocity {
+
+pocolog_cpp::InputDataStream* PocologTools::getDataStreamFromLog(
     std::string path, std::string stream_name) {
 
   pocolog_cpp::InputDataStream *data_stream = NULL;
   try {
     pocolog_cpp::LogFile log_file(path);
-    pocolog_cpp::Stream *stream = &(log_file.getStream(stream_name));
-    data_stream = dynamic_cast<pocolog_cpp::InputDataStream *>(stream);
+    data_stream = dynamic_cast<pocolog_cpp::InputDataStream *>(&(log_file
+        .getStream(stream_name)));
 
   } catch (std::runtime_error e) {
     std::cerr << e.what() << std::endl;
@@ -26,3 +28,5 @@ pocolog_cpp::InputDataStream* TestTools::getDataStreamFromLog(
   return data_stream;
 
 }
+
+} /* namespace fps_per_velocity */

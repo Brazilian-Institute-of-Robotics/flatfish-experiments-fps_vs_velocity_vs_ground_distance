@@ -88,8 +88,6 @@ std::vector<cv::DMatch> ImageDetectorDescriptor::filterMatchersByDistance(
   //-- Quick calculation of max and min distances between keypoints
   for (int i = 0; i < matchers.size(); ++i) {
     double dist = matchers[i].distance;
-    if (dist < min_dist)
-      min_dist = dist;
     if (dist > max_dist)
       max_dist = dist;
   }
@@ -113,7 +111,8 @@ ImageDetectorDescriptor::~ImageDetectorDescriptor() {
 std::vector<cv::DMatch> ImageDetectorDescriptor::filterMatchersByRansacHomografy(
     std::vector<cv::DMatch> matchers,
     std::vector<cv::KeyPoint> previus_keypoints,
-    std::vector<cv::KeyPoint> current_keypoints, int ransacReprojThreshold) {
+    std::vector<cv::KeyPoint> current_keypoints, int ransacReprojThreshold,
+    cv::Mat *homografy) {
 
   std::vector<cv::Point2f> obj;
   std::vector<cv::Point2f> scene;
@@ -124,8 +123,13 @@ std::vector<cv::DMatch> ImageDetectorDescriptor::filterMatchersByRansacHomografy
   }
 
   cv::Mat selectedSet;
-  cv::Mat H = cv::findHomography(obj, scene, CV_RANSAC, ransacReprojThreshold,
-                                 selectedSet);
+  cv::Mat temp_homografy = cv::findHomography(obj, scene, CV_RANSAC,
+                                              ransacReprojThreshold,
+                                              selectedSet);
+
+  if (homografy) {
+    temp_homografy.copyTo((*homografy));
+  }
 
   std::vector<cv::DMatch> final_matchers;
   for (uint i = 0; i < selectedSet.rows; ++i) {
