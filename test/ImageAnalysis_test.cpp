@@ -192,6 +192,7 @@ BOOST_AUTO_TEST_CASE(CalcOverlapPercentInLog_testcase) {
 
     overlaped_areas.push_back(overlaped_area);
 
+// show keypoints
 //    cv::Mat image_matchs;
 //    cv::drawMatches(image_previus_features.image(),
 //                    image_previus_features.key_points(),
