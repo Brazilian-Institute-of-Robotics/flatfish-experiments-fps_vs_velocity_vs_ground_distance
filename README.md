@@ -1,4 +1,4 @@
-fps_per_velocity
+fps_vs_velocity_vs_ground_distance
 =============
 Define rate of frames per senconds based on dvl velocity
 
