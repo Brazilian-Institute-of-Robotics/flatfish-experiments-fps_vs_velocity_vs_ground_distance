@@ -14,6 +14,8 @@
 
 #include <frame_helper/FrameHelper.h>
 
+#include <iostream>
+
 namespace fps_per_velocity {
 
 class PocologTools {

@@ -485,13 +485,17 @@ ImageAnalysisTool image_analysis;
 
 
 BOOST_AUTO_TEST_CASE(takeImges_testCase) {
- float data_stream_size_percent = 1.0;
- float skip_frames = 5;
+  float data_stream_size_percent = 1.0;
+  float skip_frames = 5;
+  float resize = 0.5;
 
- // std::string path = "/home/trocoli/jarvis/Documents/BIR-dataset/log_hd_02/log/ff-payload/20170928-0907/";
- std::string path = "/home/trocoli/Documents/logs/";
- std::string file_name = "camera_aravis_front_left.0.log";
- std::string stream_name ="camera_aravis_front_left.frame";
+  // std::string path = "/home/trocoli/jarvis/Documents/BIR-dataset/log_hd_02/log/ff-payload/20170928-0907/";
+  std::string path = "/home/trocoli/Documents/logs/";
+  std::string file_name = "camera_aravis_down_left.0.log";
+  std::string stream_name ="camera_aravis_down_left.frame";
+
+  std::string path_write = "/home/trocoli/Documents/logs/imageto3d/";
+  std::string write_name = "image_log_01_";
 
   std::cout<< " passou aqui 1 " << std::endl;
 
@@ -504,16 +508,28 @@ BOOST_AUTO_TEST_CASE(takeImges_testCase) {
                      (&(log_file.getStream(stream_name)));
 
   SingleImageHazeRemoval *hazeRemoval = new CLAHE();
-  for (int i = 0; ; i++) {
 
-    cv::Mat cv_image = PocologTools::getMatFromStream<
-      base::samples::frame::Frame>(out_stream, i, data_stream_size_percent);
+  // int j=0;
+  for (int i = 0; i < 100 ; i++) {
 
-    cv::resize(cv_image, cv_image, cv::Size(), 0.2, 0.2);
-    cv::imshow("out image", cv_image);
-    cv::waitKey(1);
+    if(i%5 == 0){
+      cv::Mat cv_image = PocologTools::getMatFromStream<
+        base::samples::frame::Frame>(out_stream, i, data_stream_size_percent);
 
+      cv::resize(cv_image, cv_image, cv::Size(), resize, resize);
+      // cv::imshow(" BEFORE CLAHE ", cv_image);
+
+      cv_image = hazeRemoval->applyHazeRemoval(cv_image);
+
+      cv::imwrite( path_write + write_name + std::to_string(i) + ".jpg" ,
+                   cv_image );
+
+      cv::imshow(" CLAHE ", cv_image);
+      cv::waitKey(1);
+    }
   }
+
+  delete hazeRemoval;
 }
 
 //
