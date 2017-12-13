@@ -54,6 +54,24 @@ struct InputParamatersStruct {
 };
 typedef InputParamatersStruct InputParameters;
 
+
+// fx: 1993.04
+// cx: 995.856
+// fy: 1998.89
+// cy: 1030.42
+// d0: 0.0870984
+// d1: 0.0225211
+// d2: -0.00145666
+// d3: -0.000153369
+
+
+const cv::Mat camera_k = (cv::Mat_<double>(3,3) <<
+                          1993.04, 0, 995.856,
+                          0, 1998.89, 1030.42,
+                          0, 0, 1);
+const cv::Mat camera_dist = (cv::Mat_<double>(1,4) <<
+                        0.0870984, 0.0225211, -0.00145666, -0.000153369);
+
 const std::string keys =
   "{d   |     directory|            .|Log file path}"
   "{s   |        stream|             |Log data stream name}"
@@ -67,8 +85,8 @@ const std::string keys =
   "{sf  | sift_features|        20000|Max sift features}"
   "{se  |sift_max_error|          0.5|Max sift error. Values -> [0.0, 1.0] }"
   "{fps |           FPS|           10|Number of frame per second }"
-  "{Mfo |   max_overlap|          0.95|Max overlap percent }"
-  "{mfo |   min_overlap|          0.85|Minimum overlap percent }"
+  "{Mfo |   max_overlap|         0.95|Max overlap percent }"
+  "{mfo |   min_overlap|         0.80|Minimum overlap percent }"
   "{v   |       verbose|        false|Verbose procedure }";
 
 void help(cv::CommandLineParser parser){
@@ -143,22 +161,24 @@ std::string writeImage(cv::Mat original_image,
                        uint digit_size){
 
     std::string out_file = path + includeZeros(id, digit_size) + ".jpg";
+    std::string clahe_file = path +"clahe_" +
+                             includeZeros(id, digit_size) + ".jpg";
 
     //TODO Refactor this code
 
-    // cv::Mat image = original_image.clone();
-    //
-    // cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
-    // std::vector<cv::Mat> channels;
-    // cv::cvtColor(image, image, CV_BGR2HSV);
-    // cv::split(image, channels);
-    //
-    // clahe->setClipLimit( 3 );
-    // clahe->apply( channels[2], channels[2] );
-    //
-    // cv::merge(channels, image);
-    // cv::cvtColor(image, image, CV_HSV2BGR);
-    // cv::imwrite(out_file, image);
+    cv::Mat image = original_image.clone();
+
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+    std::vector<cv::Mat> channels;
+    cv::cvtColor(image, image, CV_BGR2HSV);
+    cv::split(image, channels);
+
+    clahe->setClipLimit( 4 );
+    clahe->apply( channels[2], channels[2] );
+
+    cv::merge(channels, image);
+    cv::cvtColor(image, image, CV_HSV2BGR);
+    cv::imwrite(clahe_file, image);
 
     cv::imwrite(out_file, original_image);
     return out_file;
@@ -281,7 +301,6 @@ int intersectArea( std::vector<cv::Point2f> points_1,
     return area;
  }
 
-
 int main(int argc, char const *argv[]) {
 
   cv::CommandLineParser parser(argc, argv, keys.c_str());
@@ -319,6 +338,11 @@ int main(int argc, char const *argv[]) {
 
   descriptor_matcher = new cv::BFMatcher(cv::NORM_L2, true);
 
+  cv::Mat map1, map2;
+  cv::Size im_size(2040,2040);
+  cv::initUndistortRectifyMap(camera_k, camera_dist, cv::Mat(), camera_k,
+                              im_size, CV_16SC2, map1, map2);
+
   std::cout << "Loading stream ..." << std::endl;
   pocolog_cpp::InputDataStream* stream;
   pocolog_cpp::LogFile log_file(input_parameters.directory);
@@ -337,6 +361,8 @@ int main(int argc, char const *argv[]) {
       ImageData temp_image;
       cv::Mat image_cv = frame_helper::FrameHelper::convertToCvMat(frame_rock);
       cv::cvtColor(image_cv, image_cv, CV_BayerGR2RGB);
+      cv::remap(image_cv, image_cv, map1, map2, cv::INTER_CUBIC);
+
       reduceBoder(image_cv, input_parameters.reduce_boder);
       cv::resize( image_cv,
                   image_cv,
@@ -373,6 +399,13 @@ int main(int argc, char const *argv[]) {
 
       matchs = filterMatchersByDistance(matchs,
                                         input_parameters.sift_max_error);
+
+      if(matchs.size() < 10){
+        std::cout << " Ignore image: low number of matchs < 10 " << std::endl;
+        continue;
+      }
+
+      
       cv::Mat homografy;
       computeHomografy(matchs,
                        temp_image.key_points,
